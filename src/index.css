@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Istok+Web:ital,wght@0,400;0,700;1,400;1,700&family=RocknRoll+One&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+   html {
+      color: #212245;
+   }
+   tr,
+   th,
+   td {
+      border: 2px solid #fde4e4;
+   }
+   table {
+      border-collapse: collapse;
+   }
+   input {
+      width: 100%;
+   }
+   input:focus {
+      outline: none;
+   }
+}
