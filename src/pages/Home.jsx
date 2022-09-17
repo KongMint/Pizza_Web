@@ -10,6 +10,9 @@ import {
 
 import React from 'react';
 import { helmet } from '../helmet';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
 
 function Home() {
    helmet('Home');

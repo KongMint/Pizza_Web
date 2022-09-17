@@ -7,16 +7,23 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Cart } from '../../components/home';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import MainLinksComp from '../../router/MainLinksComp';
 import { Modal } from '../../components/shared';
 import logo from '../../assets/images/res-logo.png';
 import { setActivePage } from '../../store/activePage/activePage';
 import { showCartActs } from '../../store/shoppingCart/showCartSlice';
 import { showMenuActs } from '../../store/menu/showMenuSlice';
+import { auth } from '../../firebase/config';
+import { useNavigate } from 'react-router-dom';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { useEffect, useState } from 'react';
 
 function Header() {
    const dispatch = useDispatch();
+   const navigate = useNavigate()
+   const location = useLocation()
+   const [user, setUser] = useState()
 
    //showMenu slice:
    const handleDispatchShowMenu = () => {
@@ -36,10 +43,27 @@ function Header() {
       dispatch(showMenuActs.toggleShowMenu('hide'));
    };
    const isShowCart = useSelector((state) => state.showCart.isShowCart);
+   const handleLogout = async () => {
+      try {
+         await signOut(auth)
+      } catch (error) {
+         console.log(error)
+      }
+   }
 
    const cartTotalQuantity = useSelector(
       (state) => state.cart.cartTotalQuantity
    );
+
+   useEffect(()=>{
+      onAuthStateChanged(auth, (user) => {
+         if (user) {
+           setUser(auth.currentUser)
+         } else {
+            setUser({})
+         }
+       });
+   },[])
 
    //activePage slice: (set active state - red color for login)
    const activePage = useSelector((state) => state.activePage.activePage);
@@ -78,7 +102,7 @@ function Header() {
                         </span>
                      ) : null}
                   </div>
-                  <Link
+                  {!user?.email && <Link
                      onClick={() => {
                         dispatch(setActivePage('/login'));
                         handleHideCartAndBar();
@@ -91,7 +115,8 @@ function Header() {
                            activePage == '/login' ? 'text-red-500' : ''
                         }`}
                      />
-                  </Link>
+                  </Link>}
+                  {user?.email && <p style={{marginTop: '5px', marginLeft: '10px'}}>{user.email}   <span style = {{textDecoration: 'underline', cursor: 'pointer', color: 'red'}} onClick = {()=>handleLogout()}>Đăng Xuất</span></p>}
                   <div
                      onClick={handleDispatchShowMenu}
                      className={`md:hidden text-2xl md:text-3xl cursor-pointer ${

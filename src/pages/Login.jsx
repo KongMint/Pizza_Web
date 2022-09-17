@@ -3,22 +3,31 @@ import React, { useState } from 'react';
 import { CommonBanner } from '../components/shared';
 import { Link } from 'react-router-dom';
 import { helmet } from '../helmet';
+import { auth } from '../firebase/config';
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { useNavigate } from 'react-router-dom';
+import { notify } from '../helper/notify';
 
 function Login() {
+   const navigate = useNavigate()
    helmet('Login');
    const [userEmail, setUserEmail] = useState('');
    const [userPassword, setUserPassword] = useState('');
    const handleSubmit = (e) => {
       e.preventDefault();
    };
-   const handleUserLoginInfo = () => {
-      const USER_LOGIN_INFO = [
-         {
-            userEmail,
-            userPassword,
-         },
-      ];
-      console.info('... successfully get USER_LOGIN_INFO', USER_LOGIN_INFO);
+   const handleUserLoginInfo = async () => {
+      try {
+         const result = await signInWithEmailAndPassword(auth, userEmail, userPassword)
+         if(result.user){
+            navigate('/')
+         }else{
+            notify("User email or password wrong", 'error')
+         }
+      } catch (error) {
+         console.log(error)
+         notify("User email or password wrong", 'error')
+      }
    };
    return (
       <section>

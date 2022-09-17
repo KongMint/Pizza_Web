@@ -3,27 +3,29 @@ import React, { useState } from 'react';
 import { CommonBanner } from '../components/shared';
 import { Link } from 'react-router-dom';
 import { helmet } from '../helmet';
+import { auth } from '../firebase/config';
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { notify } from '../helper/notify';
 
 function Register() {
    helmet('Register');
-   const [userName, setUserName] = useState('');
    const [userEmail, setUserEmail] = useState('');
    const [userPassword, setUserPassword] = useState('');
    const handleSubmit = (e) => {
       e.preventDefault();
    };
-   const handleUserRegisterInfo = () => {
-      const USER_REGISTER_INFO = [
-         {
-            userEmail,
-            userPassword,
-            userName,
-         },
-      ];
-      console.info(
-         '... successfully get USER_REGISTER_INFO',
-         USER_REGISTER_INFO
-      );
+   const handleUserRegisterInfo = async () => {
+      try {
+         const result = await createUserWithEmailAndPassword(auth, userEmail, userPassword)
+         if(result.user){
+            notify("Register Success", 'success')
+         }else{
+            notify("Register Failed", 'error')
+         }
+      } catch (error) {
+         notify("Register Failed", 'error')
+         console.log(error)
+      }
    };
    return (
       <section>
@@ -33,12 +35,6 @@ function Register() {
                onSubmit={(e) => handleSubmit(e)}
                className='flex flex-col items-center w-[60vw] sm:w-[40vw] max-w-[500px] mx-auto py-4 px-3 rounded-sm bg-lpink [&_input]:px-3 [&_input]:py-1  [&_input]:rounded-sm [&_input]:mb-3 [&_input]:outline-none'
             >
-               <input
-                  onChange={(e) => setUserName(e.target.value)}
-                  type='text'
-                  required
-                  placeholder='Enter your name'
-               />
                <input
                   onChange={(e) => setUserEmail(e.target.value)}
                   type='email'
